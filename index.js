@@ -7,7 +7,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-const {addUser} = require('./repository/user.repo')
+const {addUser, removeUserById} = require('./repository/user.repo')
 
 app.use(bodyParser.json())
 
@@ -20,6 +20,16 @@ app.post("/user", async (req,res)=>{
     let user = await addUser(req.body)
     res.send({status : 200, user})
   } catch (error) {
+    res.send({status : 400, error})
+  }
+})
+
+app.delete("/user", async (req,res)=>{
+  try {
+    let response = await removeUserById(req.body)
+    res.send({status : 200, response})
+  } catch (error) {
+    console.log(error)
     res.send({status : 400, error})
   }
 })

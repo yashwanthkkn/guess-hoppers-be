@@ -5,3 +5,5 @@ AWS.config.loadFromPath('./config.json');
 
 const client = new AWS.DynamoDB.DocumentClient();
 const tableName = 'gh-chat';
+
+const createChat = async (data)=>
