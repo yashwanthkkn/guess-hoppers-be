@@ -7,7 +7,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-const {addUser} = require('./repository/user.repo')
+const {addUser, getUsersByRoom, deleteUsersByRoom} = require('./repository/user.repo')
 
 app.use(bodyParser.json())
 
@@ -20,6 +20,26 @@ app.post("/user", async (req,res)=>{
     let user = await addUser(req.body)
     res.send({status : 200, user})
   } catch (error) {
+    res.send({status : 400, error})
+  }
+})
+
+app.get("/room/users/:roomId", async (req,res)=>{
+  try {
+    let users = await getUsersByRoom(req.params['roomId'])
+    res.send({status : 200, users})
+  } catch (error) {
+    console.log(error);
+    res.send({status : 400, error})
+  }
+})
+
+app.delete("/room/users/:roomId", async (req,res)=>{
+  try {
+    let response = await deleteUsersByRoom(req.params['roomId'])
+    res.send({status : 200, response})
+  } catch (error) {
+    console.log(error);
     res.send({status : 400, error})
   }
 })
