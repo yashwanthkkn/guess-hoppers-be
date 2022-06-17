@@ -15,7 +15,6 @@ const addUser = async (data)=>{
             userName : userName,
             userId : uuidv4(),
             joinNumber : 0,
-            roomId : 1
         }    
         console.log("username:"+userName);
     
