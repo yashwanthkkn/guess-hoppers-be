@@ -9,6 +9,8 @@ const io = new Server(server);
 
 const {addUser, removeUserById} = require('./repository/user.repo')
 
+const { createRoom, updateRoom, clearRoom} = require('./repository/room.repo');
+
 app.use(bodyParser.json())
 
 io.on('connection', (socket) => {
@@ -33,6 +35,34 @@ app.delete("/user", async (req,res)=>{
     res.send({status : 400, error})
   }
 })
+
+app.post("/room", async (req, res) => {
+  try {
+    let room = await createRoom(req.body);
+    res.send({ status: 200, room });
+  } catch (error) {
+    res.send({ status: 400, error });
+  }
+});
+
+
+app.post("/room/:roomId", async (req, res) => {
+  try {
+    let updateroom = await updateRoom(req.body)
+    res.send({ status: 200, updateroom })
+  } catch (error) {
+    res.send({ status: 400, error })
+  }
+})
+
+app.delete("/room", async (req, res) => {
+  try {
+    let room = await clearRoom(req.body);
+    res.send({ status: 200, room });
+  } catch (error) {
+    res.send({ status: 400, error });
+  }
+});
 
 server.listen(3000, () => {
   console.log('listening on :3000');

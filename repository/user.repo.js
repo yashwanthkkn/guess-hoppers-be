@@ -51,12 +51,12 @@ const removeUserById = async (data)=>{
     
         client.delete(params, function(err, data) {
             if (err){
-                console.error("Unable to get item.");
+                console.error("Unable to delete item.");
                 console.error("Error JSON:", JSON.stringify(err, null, 2));
                 reject(err);
             } 
             else{
-                console.log("Got item:", JSON.stringify(data, null, 2));
+                console.log("Deleted item:", JSON.stringify(data, null, 2));
                 resolve(data);
             } 
         });
