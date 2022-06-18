@@ -52,13 +52,14 @@ const updateRoom = async (data) => {
         let ExpressionAttributeValues = {};
         console.log(data);
         for (const property in data) {
+            ExpressionAttributeValues[':' + property] = data[property];
             if (property == 'roomId')
                 continue
-            updateExpression += ` #${property} = :${property} ,`;
             ExpressionAttributeNames['#' + property] = property;
-            ExpressionAttributeValues[':' + property] = data[property];
+            updateExpression += ` #${property} = :${property} ,`;
         }
-
+        console.log(ExpressionAttributeNames);
+        console.log(ExpressionAttributeValues);
         updateExpression = updateExpression.slice(0, -1);
 
         var params = {
@@ -67,6 +68,7 @@ const updateRoom = async (data) => {
                 roomId: roomId
             },
             UpdateExpression: updateExpression,
+            ConditionExpression: 'roomId = :roomId',
             ExpressionAttributeNames: ExpressionAttributeNames,
             ExpressionAttributeValues: ExpressionAttributeValues,
         }
