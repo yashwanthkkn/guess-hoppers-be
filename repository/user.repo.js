@@ -6,6 +6,7 @@ AWS.config.loadFromPath('./config.json');
 const client = new AWS.DynamoDB.DocumentClient();
 const tableName = 'gh-user';
 
+// add new user to db
 const addUser = async (data) => {
     return new Promise((resolve, reject) => {
         
@@ -37,7 +38,7 @@ const addUser = async (data) => {
 
 }
 
-
+// remove user from dynamodb
 const removeUserById = async (data)=>{
     return new Promise((resolve, reject) => {
         
@@ -49,7 +50,7 @@ const removeUserById = async (data)=>{
                 userId : userId
             }
         };
-    
+
         client.delete(params, function(err, data) {
             if (err){
                 console.error("Unable to get item.");
@@ -64,6 +65,8 @@ const removeUserById = async (data)=>{
     })
 }
 
+
+// Fetch  a user by Id
 const getUserById = async (data) => {
     return new Promise((resolve, reject)=>{
 
@@ -90,14 +93,17 @@ const getUserById = async (data) => {
     })
 }
 
-const updateUser = async (data, userId) => {
+
+// Update a user in DB
+const updateUser = async (data) => {
     
     return new Promise((resolve, reject) => { 
         
+        let {userId} = data 
         let updateExpression='set';
         let ExpressionAttributeNames={};
         let ExpressionAttributeValues = {};
-        console.log(data);
+        
         for(const property in data){
             if(property == 'userId')
                 continue
@@ -159,13 +165,11 @@ const deleteUsersByRoom = async (roomId)=>{
     return new Promise(async(resolve, reject) => {
  
         try{
-            let users = getUsersByRoom(roomId)
-            for (let i = 0; i < users.length; i++) {
-                await removeUserById(users[i].userId)
+            let users = await getUsersByRoom(roomId)
+            for(user in users){
+                // user act as a iterator
+                await removeUserById(users[user])
             }
-            // users.forEach((user) => {
-            //     removeUserById(user.userId)
-            // }); 
             resolve('deleted');
 
         } catch (error) {
