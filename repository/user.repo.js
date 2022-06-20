@@ -6,7 +6,7 @@ AWS.config.loadFromPath('./config.json');
 const client = new AWS.DynamoDB.DocumentClient();
 const tableName = 'gh-user';
 
-const addUser = async (data)=>{
+const addUser = async (data) => {
     return new Promise((resolve, reject) => {
         
         let {userName} = data;
@@ -18,12 +18,12 @@ const addUser = async (data)=>{
             joinNumber : 0,
             roomId: roomId
         }    
-    
+
         let params = {
             TableName: tableName,
             Item: user
         };
-    
+
         client.put(params, (err) => {
             if (err) {
                 console.error("Unable to add item.");
