@@ -37,6 +37,33 @@ const addUser = async (data) => {
 
 }
 
+
+const removeUserById = async (data)=>{
+    return new Promise((resolve, reject) => {
+        
+        let {userId} = data;
+      
+        var params = {
+            TableName: tableName,
+            Key: {
+                userId : userId
+            }
+        };
+    
+        client.delete(params, function(err, data) {
+            if (err){
+                console.error("Unable to get item.");
+                console.error("Error JSON:", JSON.stringify(err, null, 2));
+                reject(err);
+            } 
+            else{
+                console.log("Got item:", JSON.stringify(data, null, 2));
+                resolve(data);
+            } 
+        });
+    })
+}
+
 const getUserById = async (data) => {
     return new Promise((resolve, reject)=>{
 
@@ -151,5 +178,6 @@ module.exports.User = {
     getUserById,
     updateUser,
     getUsersByRoom,
-    deleteUsersByRoom
+    deleteUsersByRoom,
+    removeUserById    
 }

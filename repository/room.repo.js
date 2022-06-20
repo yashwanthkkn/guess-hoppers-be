@@ -87,8 +87,36 @@ const updateRoom = async (data) => {
 
 }
 
+const clearRoom = async (data) => {
+    return new Promise((resolve, reject) => {
+
+        let {roomId} = data;
+
+
+        var params = {
+            TableName: tableName,
+            Key: {
+                roomId: roomId
+            }
+        };
+
+        client.delete(params, function(err, data) {
+            if (err){
+                console.error("Unable to delete item.");
+                console.error("Error JSON:", JSON.stringify(err, null, 2));
+                reject(err);
+            } 
+            else{
+                console.log("Deleted item:", JSON.stringify(data, null, 2));
+                resolve(data);
+            } 
+        });
+    })
+
+}
 
 module.exports = {
     createRoom,
-    updateRoom
+    updateRoom,
+    clearRoom
 }
