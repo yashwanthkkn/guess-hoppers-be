@@ -32,9 +32,6 @@ app.get("/user/:userId",async (req,res)=>{
     let user = await User.getUserById(req.params)
     res.send({status : 200, user})
   } catch (error) {
-    let user = await addUser(req.body)
-    res.send({ status: 200, user })
-  } catch (error) {
     res.send({ status: 400, error })
   }
 })
@@ -68,10 +65,10 @@ app.get("/room/users/:roomId", async (req,res)=>{
   }
 })
 
-
+// Update user
 app.post("/user/:userId",async (req,res)=>{
   try {
-    let user = await User.updateUser(req.body)
+    let user = await User.updateUser(req.body, req.params['userId'])
     res.send({status : 200, user})
      } catch (error) {
     console.log(error);

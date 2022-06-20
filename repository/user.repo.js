@@ -84,16 +84,15 @@ const getUserById = async (data) => {
             } 
             else{
                 console.log("Got item:", JSON.stringify(data, null, 2));
-                resolve(data);
+                resolve(data["Item"]);
             } 
         });
     })
 }
 
-const updateUser = async (data) => {
+const updateUser = async (data, userId) => {
     
-    return new Promise((resolve, reject) => {
-        let {userId} = data 
+    return new Promise((resolve, reject) => { 
         
         let updateExpression='set';
         let ExpressionAttributeNames={};
@@ -150,20 +149,23 @@ const getUsersByRoom = async (roomId)=>{
         .then(users => {
             resolve(users["Items"])
         })
-        .catch(reject(err))
+        .catch(err => reject(err))
     })
 
 }
 
 // Delete all users of a Room
 const deleteUsersByRoom = async (roomId)=>{
-    return new Promise((resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
  
         try{
             let users = getUsersByRoom(roomId)
-            users.forEach((user) => {
-                removeUserById(user.userId)
-            });
+            for (let i = 0; i < users.length; i++) {
+                await removeUserById(users[i].userId)
+            }
+            // users.forEach((user) => {
+            //     removeUserById(user.userId)
+            // }); 
             resolve('deleted');
 
         } catch (error) {
