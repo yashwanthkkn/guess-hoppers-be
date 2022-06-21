@@ -18,28 +18,25 @@ const { User } = require('./lib/repository/user.repo');
 app.use(bodyParser.json())
 app.use(routes)
 
-const formatMessage = (username, message)=>{
-  return {username, message}
-}
 
-const botName = "GameBot"
+const botName = "Game"
 
 io.on('connection', (socket) => {
   // console.log(socket.id, socket.rooms);
   console.log("User connected");
 
   socket.on('joinGame', ({roomId,user}) => {
-    
-    // socket.join(roomId) 
+    console.log(roomId,user)
+    socket.join(roomId) 
 
-    // socket.emit('message', formatMessage(botName,"Welcome to the Game"))
+    socket.emit('message', {userName : botName, message : "Welcome to the Game"})
 
-    // socket.broadcast
-    //   .to(roomId)
-    //   .emit(
-    //     'message',
-    //     formatMessage(botName, `${user.username} has joined the Game`)
-    //   );
+    socket.broadcast
+      .to(roomId)
+      .emit(
+        'message',
+        {userName : botName, message : `${user.userName} has joined the Game`},
+      );
 
     // // get already existing users using http req
     // // use this to get new users
@@ -57,7 +54,7 @@ io.on('connection', (socket) => {
       .to(roomId)
       .emit(
         'message',
-        formatMessage(userName, message)
+        {userName : userName, message : message}
       );
   })
 
