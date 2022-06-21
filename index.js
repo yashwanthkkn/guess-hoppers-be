@@ -28,22 +28,22 @@ io.on('connection', (socket) => {
 
   socket.on('joinGame', ({roomId,user}) => {
     
-    socket.join(roomId) 
+    // socket.join(roomId) 
 
-    socket.emit('message', formatMessage(botName,"Welcome to the Game"))
+    // socket.emit('message', formatMessage(botName,"Welcome to the Game"))
 
-    socket.broadcast
-      .to(roomId)
-      .emit(
-        'message',
-        formatMessage(botName, `${user.username} has joined the Game`)
-      );
+    // socket.broadcast
+    //   .to(roomId)
+    //   .emit(
+    //     'message',
+    //     formatMessage(botName, `${user.username} has joined the Game`)
+    //   );
 
-    // get already existing users using http req
-    // use this to get new users
-    io.to(roomId).emit('newUser', {
-      user: user
-    });
+    // // get already existing users using http req
+    // // use this to get new users
+    // io.to(roomId).emit('newUser', {
+    //   user: user
+    // });
   })
 
   socket.on('guess', ({roomId, userId, guess}) => {
