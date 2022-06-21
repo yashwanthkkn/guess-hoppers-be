@@ -45,8 +45,17 @@ io.on('connection', (socket) => {
     // });
   })
 
-  socket.on('guess', ({roomId, userId, guess}) => {
-    // Todo
+  socket.on('guess', ({roomId, userId,userName, guess}) => {
+    if(false){
+      // TODO
+    } else {
+      socket.broadcast
+      .to(roomId)
+      .emit(
+        'guess',
+        {userName : userName, guess : guess}
+      );
+    }
   })
 
   socket.on('message', ({roomId,userName, message}) => {
