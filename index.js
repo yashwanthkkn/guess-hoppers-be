@@ -15,6 +15,8 @@ const io = new Server(server, {
 const routes = require('./lib/controllers');
 const { User } = require('./lib/repository/user.repo');
 const { RoomService } = require('./lib/services/room.service');
+const {UserService} = require("./lib/services/user.service");
+const {Room} = require("./lib/repository/room.repo");
 
 app.use(bodyParser.json())
 app.use(routes)
@@ -78,9 +80,59 @@ io.on('connection', (socket) => {
       );
   })
 
+  socket.on("canvas-data",({roomId,userName, canvas})=>{
+
+    socket.broadcast
+        .to(roomId)
+        .emit(
+            'canvas-data',
+            {userName : userName,canvas : canvas}
+        );
+  })
+
   socket.on("disconnect", (reason) => {
     console.log("User disconnected", reason)
   });
+
+  socket.on("start",async ({roomId}) => {
+    let room = await Room.getRoomById(roomId);
+    let user = await User.getUserById({userId :room.hostId });
+    console.log("Game Start triggered",user)
+    io.to(roomId).emit("start",{user});
+  })
+
+  socket.on("restart",async ({roomId, currentUserId}) => {
+    let room = await Room.getRoomById(roomId);
+    let currentUser = await User.getUserById({userId :currentUserId });
+    let users = await User.getUsersByRoom(roomId);
+    let nextUser = null;
+    console.log(currentUser)
+    console.log(users)
+    for (let i=0; i<users.length; i++) {
+
+      if(users[i].joinNumber-1 === currentUser.joinNumber)
+      {
+        nextUser= users[i];
+        break
+      }
+    }
+    if(!nextUser){
+      nextUser = await User.getUserById({userId :room.hostId});
+    }
+    console.log("Game restart triggered")
+    console.log(nextUser)
+    io.to(roomId).emit("restart", {user:nextUser});
+
+  })
+
+  socket.on("started-drawing",({roomId,userName})=>{
+    socket.broadcast
+        .to(roomId)
+        .emit(
+            'message',
+            {userName: "Game", message: userName+" has started drawing..."}
+        );
+  })
 });
 
 server.listen(3000, () => {
