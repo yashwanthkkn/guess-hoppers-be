@@ -7,13 +7,14 @@ app.use(cors())
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server,{
-  cors : {
-    origin : '*'
+const io = new Server(server, {
+  cors: {
+    origin: '*'
   }
 });
 const routes = require('./lib/controllers');
 const { User } = require('./lib/repository/user.repo');
+const { RoomService } = require('./lib/services/room.service');
 
 app.use(bodyParser.json())
 app.use(routes)
@@ -25,17 +26,17 @@ io.on('connection', (socket) => {
   // console.log(socket.id, socket.rooms);
   console.log("User connected");
 
-  socket.on('joinGame', ({roomId,user}) => {
-    console.log(roomId,user)
-    socket.join(roomId) 
+  socket.on('joinGame', ({ roomId, user }) => {
+    console.log(roomId, user)
+    socket.join(roomId)
 
-    socket.emit('message', {userName : botName, message : "Welcome to the Game"})
+    socket.emit('message', { userName: botName, message: "Welcome to the Game" })
 
     socket.broadcast
       .to(roomId)
       .emit(
         'message',
-        {userName : botName, message : `${user.userName} has joined the Game`},
+        { userName: botName, message: `${user.userName} has joined the Game` },
       );
 
     // // get already existing users using http req
@@ -45,25 +46,35 @@ io.on('connection', (socket) => {
     // });
   })
 
-  socket.on('guess', ({roomId, userId,userName, guess}) => {
-    if(false){
-      // TODO
+  socket.on('guess', async ({ roomId, userId, userName, guess }) => {
+
+    let guessValidationResult = await RoomService.validateGuess(roomId, userId, guess);
+    console.log(guessValidationResult);
+    if (guessValidationResult) {
+      socket.broadcast.to(roomId).emit('updatePoints', {
+        userId: userId, points: guessValidationResult.points, userName: guessValidationResult.userName
+      })
+
+      socket.emit('updatePoints', {
+        userId: userId, points: guessValidationResult.points, userName: guessValidationResult.userName
+      })
+
     } else {
       socket.broadcast
-      .to(roomId)
-      .emit(
-        'guess',
-        {userName : userName, guess : guess}
-      );
+        .to(roomId)
+        .emit(
+          'guess',
+          { userName: userName, guess: guess }
+        );
     }
   })
 
-  socket.on('message', ({roomId,userName, message}) => {
+  socket.on('message', ({ roomId, userName, message }) => {
     socket.broadcast
       .to(roomId)
       .emit(
         'message',
-        {userName : userName, message : message}
+        { userName: userName, message: message }
       );
   })
 
