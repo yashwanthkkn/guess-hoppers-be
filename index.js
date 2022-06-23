@@ -43,9 +43,9 @@ io.on('connection', (socket) => {
 
     // // get already existing users using http req
     // // use this to get new users
-    // io.to(roomId).emit('newUser', {
-    //   user: user
-    // });
+    io.to(roomId).emit('newUser', {
+      user: user
+    });
   })
 
   socket.on('guess', async ({ roomId, userId, userName, guess }) => {
@@ -132,7 +132,12 @@ io.on('connection', (socket) => {
             'message',
             {userName: "Game", message: userName+" has started drawing..."}
         );
+    io.to(roomId)
+        .emit(
+            'start-timer',);
   })
+
+
 });
 
 server.listen(3000, () => {
