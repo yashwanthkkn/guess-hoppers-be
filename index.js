@@ -28,18 +28,18 @@ io.on('connection', (socket) => {
   // console.log(socket.id, socket.rooms);
   console.log("User connected");
 
-  socket.on('joinGame', ({ roomId, user }) => {
+  socket.on('joinGame', async ({roomId, user}) => {
     console.log(roomId, user)
     socket.join(roomId)
-
-    socket.emit('message', { userName: botName, message: "Welcome to the Game" })
+    await User.updateUser({userId: user.userId, socketId: socket.id})
+    socket.emit('message', {userName: botName, message: "Welcome to the Game"})
 
     socket.broadcast
-      .to(roomId)
-      .emit(
-        'message',
-        { userName: botName, message: `${user.userName} has joined the Game` },
-      );
+        .to(roomId)
+        .emit(
+            'message',
+            {userName: botName, message: `${user.userName} has joined the Game`},
+        );
 
     // // get already existing users using http req
     // // use this to get new users
@@ -90,8 +90,10 @@ io.on('connection', (socket) => {
         );
   })
 
-  socket.on("disconnect", (reason) => {
+  socket.on("disconnect", async (reason) => {
     console.log("User disconnected", reason)
+    let user = await User.getUserBySocketId(socket.id)
+    await User.removeUserById(user.userId)
   });
 
   socket.on("start",async ({roomId}) => {
@@ -102,23 +104,43 @@ io.on('connection', (socket) => {
   })
 
   socket.on("restart",async ({roomId, currentUserId}) => {
+
     let room = await Room.getRoomById(roomId);
     let currentUser = await User.getUserById({userId :currentUserId });
     let users = await User.getUsersByRoom(roomId);
     let nextUser = null;
-    console.log(currentUser)
-    console.log(users)
-    for (let i=0; i<users.length; i++) {
+    // console.log(currentUser)
+    // console.log(users)
+    // for(let j=currentUser.joinNumber; j<=users.length; j++) {
+    //   for (let i = 0; i < users.length; i++) {
+    //     if (users[i].joinNumber - 1 === j) {
+    //       nextUser = users[i];
+    //       break
+    //     }
+    //   }
+    //   if(!nextUser) break;
+    // }
+    // if(!nextUser){
+    //   nextUser = await User.getUserById({userId :room.hostId});
+    // }
 
-      if(users[i].joinNumber-1 === currentUser.joinNumber)
-      {
-        nextUser= users[i];
-        break
+    let max = -1
+    let nextMax = 100000
+    for(let i = 0 ; i < users.length ; i++){
+      if(users[i].joinNumber > currentUser.joinNumber  ){
+        max = i
+        if(max < nextMax){
+          nextMax = max
+        }
       }
     }
-    if(!nextUser){
+    if(max === -1){
       nextUser = await User.getUserById({userId :room.hostId});
+    }else{
+      nextUser = users[nextMax];
     }
+
+    let updatedRoom = await Room.updateRoom({roomId:roomId,word:"",currPlayerUserId:nextUser.userId});
     console.log("Game restart triggered")
     console.log(nextUser)
     io.to(roomId).emit("restart", {user:nextUser});
