@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
 
     // // get already existing users using http req
     // // use this to get new users
-    io.to(roomId).emit('newUser', {
+    socket.broadcast.to(roomId).emit('newUser', {
       user: user
     });
   })
