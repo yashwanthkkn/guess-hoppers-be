@@ -110,32 +110,16 @@ io.on('connection', (socket) => {
     let currentUser = await User.getUserById({userId :currentUserId });
     let users = await User.getUsersByRoom(roomId);
     let nextUser = null;
-    // console.log(currentUser)
-    // console.log(users)
-    // for(let j=currentUser.joinNumber; j<=users.length; j++) {
-    //   for (let i = 0; i < users.length; i++) {
-    //     if (users[i].joinNumber - 1 === j) {
-    //       nextUser = users[i];
-    //       break
-    //     }
-    //   }
-    //   if(!nextUser) break;
-    // }
-    // if(!nextUser){
-    //   nextUser = await User.getUserById({userId :room.hostId});
-    // }
-
-    let max = -1
-    let nextMax = 100000
+  
+    let nextUserIdx = -1
     for(let i = 0 ; i < users.length ; i++){
       if(users[i].joinNumber > currentUser.joinNumber  ){
-        max = i
-        if(max < nextMax){
-          nextMax = max
+        if(nextUserIdx == -1 || users[i].joinNumber < users[nextUserIdx].joinNumber){
+          nextUserIdx = i
         }
       }
     }
-    if(max === -1){
+    if(nextUserIdx === -1){
       nextUser = await User.getUserById({userId :room.hostId});
     }else{
       nextUser = users[nextMax];
