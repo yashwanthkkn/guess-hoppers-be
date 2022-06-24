@@ -124,7 +124,14 @@ io.on('connection', (socket) => {
     }else{
       nextUser = users[nextUserIdx];
     }
-
+    if(room.word){
+      socket.broadcast
+        .to(roomId)
+        .emit(
+          'message',
+          { userName: "Game", message: `Correct answer is ${room.word}` }
+        );
+    }
     let updatedRoom = await Room.updateRoom({roomId:roomId,word:"",currPlayerUserId:nextUser.userId});
     console.log("Game restart triggered")
     console.log(nextUser)
