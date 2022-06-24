@@ -122,7 +122,7 @@ io.on('connection', (socket) => {
     if(nextUserIdx === -1){
       nextUser = await User.getUserById({userId :room.hostId});
     }else{
-      nextUser = users[nextMax];
+      nextUser = users[nextUserIdx];
     }
 
     let updatedRoom = await Room.updateRoom({roomId:roomId,word:"",currPlayerUserId:nextUser.userId});
