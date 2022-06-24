@@ -93,8 +93,8 @@ io.on('connection', (socket) => {
   socket.on("disconnect", async (reason) => {
     console.log("User disconnected", reason)
     let user = await User.getUserBySocketId(socket.id)
-    console.log(user.userId)
-    await User.removeUserById({userId:user.userId})
+    if(user)
+      await User.removeUserById({userId:user.userId})
   });
 
   socket.on("start",async ({roomId}) => {
